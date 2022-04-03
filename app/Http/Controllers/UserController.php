@@ -29,7 +29,6 @@ class UserController extends Controller
 
     public $rule = [
         "name" => "required|string|max:25|min:5",
-        "des" => "required|string|max:200|min:5",
         "username" => "unique:users|required|string|max:9|min:9",
         //"email"=>"unique:users|required|email|max:255|min:3",
 
@@ -358,6 +357,7 @@ class UserController extends Controller
         } else {
 
             $validation = Validator::make($request->all(), $this->rule, $this->messages());
+            $request->email=$request->username.'@serv.com';
         }
 
 
@@ -423,9 +423,8 @@ class UserController extends Controller
      */
     public function Login(Request $request)
     {
-        //  return response()->json($request->all());
-        $flitred = collect($this->rule);
 
+        $flitred = collect($this->rule);
 
         $validation =  Validator::make($request->all(), [$flitred->only('username')], $this->messages());
 

@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Requests;
 use Illuminate\Http\Request;
 use App\Models\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Image;
 
-
-use Validator;
 
 class FileMangerController extends Controller
 {
@@ -36,7 +35,7 @@ class FileMangerController extends Controller
 
         foreach ($files as $file) {
 
-          //  $smallthumbnailpath = public_path('storage/files/thumbnail/' . $file->File_name);
+            //  $smallthumbnailpath = public_path('storage/files/thumbnail/' . $file->File_name);
 
             $fileName =  Storage::get('public/files/thumbnail/' . $file->File_name);
 
@@ -65,15 +64,17 @@ class FileMangerController extends Controller
 
     ];
 
-    public function messages(){
+    public function messages()
+    {
         return [
             'file.required' => 'يجب كتابة اسم ',
             "file.mimes" => "doc , jpeg , jpg , png , docx , pdf صيغة ملف غير مقبولة الصيغ المسموحة ",
-            "file.max" =>"حجم الملف اكبر من المسموح به"
+            "file.max" => "حجم الملف اكبر من المسموح به"
 
         ];
     }
 
+//FileUploadToUser
 
     /**
      * Store a newly created resource in storage.
@@ -90,12 +91,12 @@ class FileMangerController extends Controller
         if ($file = $request->file('file')) {
 
 
-        $validation = $request->validate( $this->genralRule, $this->messages());
+            $validation = $request->validate($this->genralRule, $this->messages());
 
-      //  if ($validation->fails()) {
+            //  if ($validation->fails()) {
 
-         //  return response()->json($validation->errors(), 400);
-      //  }
+            //  return response()->json($validation->errors(), 400);
+            //  }
 
             $name = $file->getClientOriginalName();
 
@@ -110,6 +111,13 @@ class FileMangerController extends Controller
             $save->File_name = $newfilem;
             $save->ext = $file->getClientOriginalExtension();
             $save->user_id = $user->id;
+
+            if($request->req)
+            {
+                $order = Requests::find($request->req);
+                $save->user_id =  $order->User_id;
+
+            }
             $save->Request_id = $user->id;
 
             $save->save();
@@ -146,10 +154,8 @@ class FileMangerController extends Controller
             return response()->json('not found', 404);
         }
 
-        if($file->is_pro)
-        {
+        if ($file->is_pro) {
             return response()->json('not found', 404);
- 
         }
 
         //   if($file->user_id != $user->id)
@@ -162,7 +168,7 @@ class FileMangerController extends Controller
 
         //   if (file_exists($file)) {
 
-     
+
         $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
 
         return $dataUri;
@@ -185,23 +191,22 @@ class FileMangerController extends Controller
 
         $file = UploadedFile::find($id);
 
-        if($file->is_pro)
-        {
+        if ($file->is_pro) {
             return response()->json('not found', 404);
         }
 
         if (is_null($file)) {
             return response()->json('not found', 404);
         }
-  
+
         $fileName =  Storage::get('public/files/thumbnail/' . $file->File_name);
 
         $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
 
         return $dataUri;
-  
+
         //return response($fileName)->header('Content-Type', 'image/jpeg');
-    
+
     }
 
     public function showPublicImge($id)
@@ -209,23 +214,21 @@ class FileMangerController extends Controller
 
         $file = UploadedFile::find($id);
 
-        if(!$file->is_pro)
-        {
+        if (!$file->is_pro) {
             return response()->json('not found', 404);
         }
 
         if (is_null($file)) {
             return response()->json('not found', 404);
         }
-  
+
         $fileName =  Storage::get('public/files/public/' . $file->File_name);
 
-       // $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
+        // $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
 
-       // return $dataUri;
-  
+        // return $dataUri;
+
         return response($fileName)->header('Content-Type', 'image/jpeg');
-    
     }
 
 

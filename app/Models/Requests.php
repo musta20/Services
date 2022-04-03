@@ -19,6 +19,13 @@ class Requests extends Model
 
     }
 
+    public function DoneImge()
+    {
+        return $this->belongsTo(UploadedFile::class, 'done_img');
+
+    }
+
+
 
     
     use HasFactory;

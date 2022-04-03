@@ -104,16 +104,30 @@ class MessagesController extends Controller
      */
     public function show($id)
     {
-    //    $user = Auth::user();
-     //   $message = Messages::where('req_id', $id)->get();
+        $user = Auth::user();
+
+        if ($user->tokenCan('server:user')) {
+            $order = Requests::where('req_id', $id)->where('User_id',$user->id);
+        }
+
+        if ($user->tokenCan('server:company')) {
+            $order = Requests::where('req_id', $id)->where('combany_id',$user->id);
+        }
+
+        if(is_null( $order))
+        {
+            return response()->json('not found', 404);
+        }
+
+        $message = Messages::where('req_id', $id)->get();
 
 
 
-     //   if (is_null($message)) {
-     //       return response()->json('not found', 404);
-   //     }
+        if (is_null($message)) {
+            return response()->json('not found', 404);
+        }
 
-//        return response()->json($message);
+        return response()->json($message);
     }
 
     /**

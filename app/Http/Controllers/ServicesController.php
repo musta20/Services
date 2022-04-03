@@ -34,8 +34,8 @@ class ServicesController extends Controller
         "Title" => "required|string|max:255|min:3",
         "Description" => "required|string|max:255|min:3",
         "Requirement" => "required|string|max:255|min:3",
-        "Delivery_Time" => "required",
-        "IsOnTime_Service" => "required|boolean",
+      //  "Delivery_Time" => "required",
+     //   "IsOnTime_Service" => "required|boolean",
     ];
 
     /**
@@ -104,6 +104,10 @@ class ServicesController extends Controller
         $serviceItem = $request->all();
 
         $serviceItem["user_id"] = $user->id;
+
+        $serviceItem["Delivery_Time"] = "2022-01-25 05:22:28";
+        $serviceItem["IsOnTime_Service"] = 0;
+        $serviceItem["NumberOf_Request_Done"] = 0;
 
         $requplArry = $serviceItem["requpl"];
 
@@ -300,8 +304,12 @@ class ServicesController extends Controller
         $services->Title = $request->Title;
         $services->Description = $request->Description;
         $services->Requirement = $request->Requirement;
-        $services->Delivery_Time = $request->Delivery_Time;
-        $services->IsOnTime_Service = $request->IsOnTime_Service;
+
+
+        $services->IsOnTime_Service = 0;
+        $services->NumberOf_Request_Done = 0;
+
+        $services->Delivery_Time = "2022-01-25 05:22:28";
         $services->cat_id = $request->cat_id;
 
 

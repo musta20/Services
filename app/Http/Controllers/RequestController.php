@@ -80,6 +80,12 @@ class RequestController extends Controller
                
                 $key->Service;
                 $key->combany;
+                if($key->done_img)
+                {
+                    $key->DoneImge;
+
+                }
+                
                 $key->msg = count($message);
             }
         }
@@ -195,7 +201,7 @@ class RequestController extends Controller
     {
         $user = Auth::user();
         $requests = Requests::find($id);
-        //return response($user->id);
+
         if ($user->id != $requests->User_id && $user->id != $requests->combany_id) {
             return response()->json('un authraized', 403);
         }
@@ -227,28 +233,30 @@ class RequestController extends Controller
         //    $thesavedreq =   Requests::create($requests);
 
 
-        $imgtogile = imgetorequest::where('req_id', $requests->id)->get();
+        imgetorequest::where('req_id', $requests->id)->delete();
 
 
+        foreach ($requestform as $img) {
 
-        foreach ($imgtogile as $key) {
+            if($img['value']){ 
 
-            $imgform = imgetorequest::find($key->id);
-
-            $id = $this->searchForId($key->input, $requestform);
-
-
-            $newbackimg = UploadedFile::find($id['value']);
-
+            $newbackimg = UploadedFile::find($img['value']);
 
             if ($newbackimg->user_id !== $user->id) {
                 return response()->json('not your imge', 401);
-            }
+            }}
 
+            $newimge = [];
+            $newimge['user_id'] = $user->id;
+            $newimge['img_id'] = $img['value'];
+            $newimge['input'] = $img['input'];
+            $newimge['req_id'] = $requests->id;
+            $newimge['combany_id'] = $requests->combany_id;
 
+            //   return $newimge;
+            imgetorequest::create($newimge);
+            //  return $bewitr;
 
-            $imgform->img_id = $id['value'];
-            $imgform->save();
         }
 
 
