@@ -37,16 +37,40 @@ class FileMangerController extends Controller
 
             //  $smallthumbnailpath = public_path('storage/files/thumbnail/' . $file->File_name);
 
-            $fileName =  Storage::get('public/files/thumbnail/' . $file->File_name);
 
-            $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
+        $thefilename =  $file->File_name;
+        if($file->ext =='pdf')
+        {
+            $thefilename = 'pdf.png';
+        }
+        if($file->ext =='doc')
+        {
+            $thefilename = 'doc.png';
+        }
 
+        if($file->ext =='docx')
+        {
+            $thefilename = 'doc.png';
+        }
+
+       // $fileName =  Storage::get('public/files/public/' . $thefilename);
+       try {
+        $fileName =  Storage::get('public/files/thumbnail/' . $thefilename);
+
+        $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);      
+     } 
+        catch (\Throwable $th) {
+            $dataUri = false;
+       }
+          
+       if($dataUri)
+       {
             array_push($filegroup, [
                 "id" => $file->id,
                 "File_name" => $file->File_name,
                 "imge" => $dataUri,
             ]);
-        }
+}        }
 
         return response()->json($filegroup);
     }
@@ -54,7 +78,7 @@ class FileMangerController extends Controller
 
     public $genralRule = [
 
-        "file" => "required|mimes:doc,jpeg,jpg,png,docx,pdf|max:2048",
+        "file" => "required|mimes:pdf.docx,doc,jpeg,jpg,png,docx|max:2048",
 
     ];
 
@@ -74,7 +98,7 @@ class FileMangerController extends Controller
         ];
     }
 
-//FileUploadToUser
+    //FileUploadToUser
 
     /**
      * Store a newly created resource in storage.
@@ -91,20 +115,21 @@ class FileMangerController extends Controller
         if ($file = $request->file('file')) {
 
 
-            $validation = $request->validate($this->genralRule, $this->messages());
+            $request->validate($this->genralRule, $this->messages());
 
-            //  if ($validation->fails()) {
-
-            //  return response()->json($validation->errors(), 400);
-            //  }
-
+    
             $name = $file->getClientOriginalName();
 
             $newfilem = rand(111, 22022) . $name;
 
             $file->storeAs('public/files/', $newfilem);
-
+            
+           $ext =  $file->getClientOriginalExtension();
+            //    return $ext;
+           if($ext !== 'pdf' && $ext !== 'docx' && $ext !== 'doc')
+           {
             $this->createThumbnail($request, $newfilem, 500, 400);
+           }
 
             $save = new UploadedFile();
 
@@ -112,24 +137,22 @@ class FileMangerController extends Controller
             $save->ext = $file->getClientOriginalExtension();
             $save->user_id = $user->id;
 
-            if($request->req)
-            {
+            if ($request->req) {
                 $order = Requests::find($request->req);
                 $save->user_id =  $order->User_id;
-
             }
             $save->Request_id = $user->id;
 
             $save->save();
 
-            $thecoded  = 'data:image/' . $file->getClientOriginalExtension() . ';base64,' . base64_encode($file);
+            $thecoded  ='data:image/' . $file->getClientOriginalExtension() . ';base64,' . base64_encode($file);
 
             return response()->json(
                 [
                     "file" => [
                         "id" => $save->id,
                         "File_name" => $save->File_name,
-                        "imge" => $thecoded
+                        "imge" => "thecoded"
                     ]
                 ]
                 //'yes yes'
@@ -199,7 +222,24 @@ class FileMangerController extends Controller
             return response()->json('not found', 404);
         }
 
-        $fileName =  Storage::get('public/files/thumbnail/' . $file->File_name);
+   
+        $thefilename =  $file->File_name;
+        if($file->ext =='pdf')
+        {
+            $thefilename = 'pdf.png';
+        }
+        if($file->ext =='doc')
+        {
+            $thefilename = 'doc.png';
+        }
+
+        if($file->ext =='docx')
+        {
+            $thefilename = 'doc.png';
+        }
+
+        
+        $fileName =  Storage::get('public/files/thumbnail/' .  $thefilename);
 
         $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
 
@@ -222,21 +262,27 @@ class FileMangerController extends Controller
             return response()->json('not found', 404);
         }
 
-        $fileName =  Storage::get('public/files/public/' . $file->File_name);
+        $thefilename =  $file->File_name;
+        if($file->ext =='pdf')
+        {
+            $thefilename = 'pdf.png';
+        }
+        if($file->ext =='doc')
+        {
+            $thefilename = 'doc.png';
+        }
 
-        // $dataUri = 'data:image/' . $file->ext . ';base64,' . base64_encode($fileName);
+        if($file->ext =='docx')
+        {
+            $thefilename = 'doc.png';
+        }
+        
+        $fileName =  Storage::get('public/files/public/' . $thefilename);
 
-        // return $dataUri;
+
 
         return response($fileName)->header('Content-Type', 'image/jpeg');
     }
-
-
-
-
-
-
-
 
     /**
      * Create a thumbnail of specified size
@@ -248,6 +294,7 @@ class FileMangerController extends Controller
     public function createThumbnail($request, $newfilem, $width, $height)
     {
 
+        
         $img = Image::make($request->file('file')->getRealPath());
         $smallthumbnailpath = public_path('storage/files/thumbnail/' . $newfilem);
 

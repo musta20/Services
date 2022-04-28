@@ -75,8 +75,8 @@ class MessagesController extends Controller
         if ($validation->fails()) {
             return response()->json($validation->errors(), 400);
         }
-        //  return [$request->all(),"Sender_id"=>$user->id];
-        // $request->Sender_id = $user->id
+
+
         $reqmessges = $request->all();
         $reqmessges["Sender_id"] = $user->id;
         $reqmessges["is_viewed"] = 0;

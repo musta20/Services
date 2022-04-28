@@ -32,7 +32,7 @@ return [
     | choice installed on your machine before you begin development.
     |
     */
-
+//https://file.io/lulCEfLlgRA5
     'connections' => [
 
         'sqlite' => [
